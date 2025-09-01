@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="bg-gray-900 text-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Loteria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .container {
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700 container mx-4 text-center">
+        <h1 class="text-3xl font-bold mb-4 text-white">Gerador de Números para Loteria</h1>
+        <p class="text-gray-400 mb-8">Clique para gerar 15 números da sorte.</p>
+        
+        <button id="gerar-btn" class="bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 shadow-lg transform hover:scale-105">
+            Gerar Números
+        </button>
+        
+        <div id="loading" class="mt-8 hidden">
+            <div class="w-8 h-8 border-4 border-white border-t-transparent border-solid rounded-full animate-spin mx-auto"></div>
+            <p class="text-gray-400 mt-2">Gerando...</p>
+        </div>
+        
+        <div id="resultado-container" class="mt-8 hidden">
+            <h2 class="text-2xl font-semibold mb-4 text-white">Seus Números:</h2>
+            <div id="numeros-loteria" class="flex flex-wrap justify-center gap-4">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gerarBtn = document.getElementById('gerar-btn');
+        const loadingDiv = document.getElementById('loading');
+        const resultadoDiv = document.getElementById('resultado-container');
+        const numerosContainer = document.getElementById('numeros-loteria');
+
+        async function gerarNumeros() {
+            gerarBtn.classList.add('hidden');
+            loadingDiv.classList.remove('hidden');
+            resultadoDiv.classList.add('hidden');
+            
+            try {
+                const response = await fetch('/gerar_numeros');
+                const numeros = await response.json();
+                
+                numerosContainer.innerHTML = '';
+                
+                numeros.forEach(numero => {
+                    const numeroEl = document.createElement('div');
+                    numeroEl.className = 'bg-emerald-500 text-white font-bold text-xl w-14 h-14 rounded-full flex items-center justify-center shadow-md';
+                    numeroEl.textContent = numero;
+                    numerosContainer.appendChild(numeroEl);
+                });
+                
+                loadingDiv.classList.add('hidden');
+                resultadoDiv.classList.remove('hidden');
+                gerarBtn.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Erro ao gerar números:', error);
+                loadingDiv.classList.add('hidden');
+                gerarBtn.classList.remove('hidden');
+                alert('Erro ao gerar os números. Por favor, tente novamente.');
+            }
+        }
+        
+        gerarBtn.addEventListener('click', gerarNumeros);
+    </script>
+</body>
+</html>
